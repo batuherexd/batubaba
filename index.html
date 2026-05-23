@@ -11,6 +11,7 @@ body{
     height:100vh;
     overflow:hidden;
     font-family:Arial;
+    cursor:pointer;
     background:black;
 }
 
@@ -61,12 +62,13 @@ h1{
     color:#00ffcc;
     font-size:70px;
     text-shadow:0 0 20px cyan, 0 0 50px #00ffcc;
-    animation:glow 2s infinite alternate;
+    animation:glitch 0.6s infinite alternate;
 }
 
-@keyframes glow{
-    from{filter:drop-shadow(0 0 10px cyan);}
-    to{filter:drop-shadow(0 0 30px #00ffcc);}
+@keyframes glitch{
+    0%{transform:translate(0);}
+    50%{transform:translate(2px,-2px);}
+    100%{transform:translate(-2px,2px);}
 }
 
 p{
@@ -82,8 +84,8 @@ p{
 
 @keyframes shake{
     0%{transform:rotate(0);}
-    50%{transform:rotate(3deg);}
-    100%{transform:rotate(-3deg);}
+    50%{transform:rotate(5deg);}
+    100%{transform:rotate(-5deg);}
 }
 
 .click{
@@ -96,8 +98,8 @@ p{
 
 <body>
 
-<!-- VIDEO (MUTED ZORUNLU) -->
-<video id="bgVideo" autoplay loop muted playsinline>
+<!-- VIDEO -->
+<video id="bgVideo" loop>
     <source src="video.mp4" type="video/mp4">
 </video>
 
@@ -107,50 +109,19 @@ p{
     <div class="fire">🔥🤣🔥</div>
     <h1>ENSAR</h1>
     <p>NENENEYE SELAM SÖYLE</p>
-    <div class="click">INTRO AKTİF</div>
+    <div class="click">BAŞLATMAK İÇİN TIKLA</div>
 </div>
 
 <script>
-let audioCtx;
-
-function ambientSound(){
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    // sürekli düşük bass ambience
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-
-    osc.type = "sine";
-    osc.frequency.value = 55;
-
-    gain.gain.value = 0.03; // düşük ses (rahatsız etmez)
-
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-
-    osc.start();
-
-    // hafif dalgalanma (cinematic his)
-    setInterval(() => {
-        osc.frequency.setValueAtTime(
-            55 + Math.random() * 5,
-            audioCtx.currentTime
-        );
-    }, 400);
-}
-
-window.addEventListener("load", () => {
+document.body.addEventListener("click", () => {
     const video = document.getElementById("bgVideo");
 
-    // video otomatik oynar (muted zorunlu)
-    video.play().catch(()=>{});
+    // video başlat + ses aç (kullanıcı etkileşimi sayesinde çalışır)
+    video.muted = false;
+    video.play().catch(() => {});
 
-    // ambient ses başlat
-    try {
-        ambientSound();
-    } catch(e) {
-        console.log("Audio blocked:", e);
-    }
+    // card gizle
+    document.querySelector(".card").style.display = "none";
 });
 </script>
 
