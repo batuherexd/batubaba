@@ -11,11 +11,10 @@ body{
     height:100vh;
     overflow:hidden;
     font-family:Arial;
-    cursor:pointer;
     background:black;
 }
 
-/* 🎥 VIDEO BACKGROUND */
+/* VIDEO */
 video{
     position:fixed;
     top:0;
@@ -27,7 +26,7 @@ video{
     filter: brightness(0.5) contrast(1.3) saturate(1.2);
 }
 
-/* koyu overlay */
+/* overlay */
 .overlay{
     position:fixed;
     top:0;
@@ -38,7 +37,7 @@ video{
     z-index:-1;
 }
 
-/* kart */
+/* card */
 .card{
     position:absolute;
     top:50%;
@@ -62,13 +61,12 @@ h1{
     color:#00ffcc;
     font-size:70px;
     text-shadow:0 0 20px cyan, 0 0 50px #00ffcc;
-    animation:glitch 0.6s infinite alternate;
+    animation:glow 2s infinite alternate;
 }
 
-@keyframes glitch{
-    0%{transform:translate(0);}
-    50%{transform:translate(2px,-2px);}
-    100%{transform:translate(-2px,2px);}
+@keyframes glow{
+    from{filter:drop-shadow(0 0 10px cyan);}
+    to{filter:drop-shadow(0 0 30px #00ffcc);}
 }
 
 p{
@@ -84,8 +82,8 @@ p{
 
 @keyframes shake{
     0%{transform:rotate(0);}
-    50%{transform:rotate(5deg);}
-    100%{transform:rotate(-5deg);}
+    50%{transform:rotate(3deg);}
+    100%{transform:rotate(-3deg);}
 }
 
 .click{
@@ -98,8 +96,8 @@ p{
 
 <body>
 
-<!-- 🎥 ARKA PLAN VİDEO -->
-<video autoplay muted loop>
+<!-- VIDEO (MUTED ZORUNLU) -->
+<video id="bgVideo" autoplay loop muted playsinline>
     <source src="video.mp4" type="video/mp4">
 </video>
 
@@ -109,53 +107,51 @@ p{
     <div class="fire">🔥🤣🔥</div>
     <h1>ENSAR</h1>
     <p>NENENEYE SELAM SÖYLE</p>
-    <div class="click">TIKLA MEME SESİ 🔊</div>
+    <div class="click">INTRO AKTİF</div>
 </div>
 
 <script>
 let audioCtx;
 
-function memeSound(){
-    if(!audioCtx){
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
+function ambientSound(){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    // meme bass drop
-    let osc = audioCtx.createOscillator();
-    let gain = audioCtx.createGain();
+    // sürekli düşük bass ambience
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
 
     osc.type = "sine";
-    osc.frequency.setValueAtTime(90, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.25);
+    osc.frequency.value = 55;
 
-    gain.gain.setValueAtTime(1, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+    gain.gain.value = 0.03; // düşük ses (rahatsız etmez)
 
     osc.connect(gain);
     gain.connect(audioCtx.destination);
 
     osc.start();
-    osc.stop(audioCtx.currentTime + 0.25);
 
-    // pop click
-    let osc2 = audioCtx.createOscillator();
-    let gain2 = audioCtx.createGain();
-
-    osc2.type = "square";
-    osc2.frequency.setValueAtTime(700, audioCtx.currentTime);
-    osc2.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
-
-    gain2.gain.setValueAtTime(0.2, audioCtx.currentTime);
-    gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-
-    osc2.connect(gain2);
-    gain2.connect(audioCtx.destination);
-
-    osc2.start();
-    osc2.stop(audioCtx.currentTime + 0.1);
+    // hafif dalgalanma (cinematic his)
+    setInterval(() => {
+        osc.frequency.setValueAtTime(
+            55 + Math.random() * 5,
+            audioCtx.currentTime
+        );
+    }, 400);
 }
 
-document.body.addEventListener("click", memeSound);
+window.addEventListener("load", () => {
+    const video = document.getElementById("bgVideo");
+
+    // video otomatik oynar (muted zorunlu)
+    video.play().catch(()=>{});
+
+    // ambient ses başlat
+    try {
+        ambientSound();
+    } catch(e) {
+        console.log("Audio blocked:", e);
+    }
+});
 </script>
 
 </body>
